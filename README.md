@@ -1,48 +1,50 @@
+🇮🇩 Bahasa Indonesia | [🇬🇧 English](README.en.md)
+
 # ESP32 Secure OTA Firmware Assessment
 
 [![ESP-IDF](https://img.shields.io/badge/ESP--IDF-v5.4-blue)](https://docs.espressif.com/projects/esp-idf/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Production-grade Over-The-Air (OTA) firmware update system for ESP32 with fail-safe mechanisms, automatic rollback, and recovery mode.
+Sistem update firmware Over-The-Air (OTA) kelas produksi untuk ESP32 dengan mekanisme fail-safe, rollback otomatis, dan recovery mode.
 
-## Features
+## Fitur
 
-- ✅ **Dual-Partition OTA**: factory + ota_0 + ota_1 layout
-- ✅ **10-Second Validation**: Automatic firmware stability check
-- ✅ **Automatic Rollback**: Boot to previous partition on crash
-- ✅ **Recovery Mode**: GPIO-triggered WiFi AP portal
-- ✅ **WiFi Configuration**: Web-based credential management
-- ✅ **LED Indicators**: Visual feedback for system state
-- ✅ **SHA256 Verification**: Firmware integrity validation
-- ✅ **Manual OTA Trigger**: HTTP-based firmware updates
+- ✅ **Dual-Partition OTA**: layout factory + ota_0 + ota_1
+- ✅ **Validasi 10 Detik**: Pengecekan stabilitas firmware otomatis
+- ✅ **Rollback Otomatis**: Boot ke partisi sebelumnya jika crash
+- ✅ **Recovery Mode**: Portal WiFi AP yang dipicu lewat GPIO
+- ✅ **Konfigurasi WiFi**: Manajemen kredensial berbasis web
+- ✅ **Indikator LED**: Umpan balik visual untuk status sistem
+- ✅ **Verifikasi SHA256**: Validasi integritas firmware
+- ✅ **Trigger OTA Manual**: Update firmware berbasis HTTP
 
-## Hardware Requirements
+## Kebutuhan Hardware
 
-| Component | Specification |
+| Komponen | Spesifikasi |
 |-----------|---------------|
 | MCU | ESP32 (ESP32, ESP32-S3, ESP32-C3) |
-| Flash | Minimum 4MB |
-| LED | Built-in or external (GPIO2) |
-| Button | Recovery trigger (GPIO4) |
+| Flash | Minimal 4MB |
+| LED | Bawaan atau eksternal (GPIO2) |
+| Tombol | Pemicu recovery (GPIO4) |
 
-## Pin Configuration
+## Konfigurasi Pin
 
-| Function | GPIO | Description |
+| Fungsi | GPIO | Deskripsi |
 |----------|------|-------------|
-| LED | 2 | Status indicator (built-in on most DevKits) |
-| Recovery Button | 4 | Hold LOW during reset to enter recovery mode |
+| LED | 2 | Indikator status (bawaan di kebanyakan DevKit) |
+| Tombol Recovery | 4 | Tahan LOW saat reset untuk masuk recovery mode |
 
-### LED Indicators
+### Indikator LED
 
-| Pattern | Interval | Meaning |
+| Pola | Interval | Arti |
 |---------|----------|---------|
-| Slow blink | 1s ON / 1s OFF | Normal operation |
-| Fast blink | 200ms ON / 200ms OFF | OTA update in progress |
-| Double blink | 2x 100ms blink, 800ms pause | Recovery mode active |
+| Kedip lambat | 1s ON / 1s OFF | Operasi normal |
+| Kedip cepat | 200ms ON / 200ms OFF | Update OTA sedang berjalan |
+| Kedip ganda | 2x kedip 100ms, jeda 800ms | Recovery mode aktif |
 
-## Quick Start
+## Mulai Cepat
 
-### Prerequisites
+### Prasyarat
 ```bash
 # Install ESP-IDF v5.4+
 git clone -b v5.4 --recursive https://github.com/espressif/esp-idf.git
@@ -57,7 +59,7 @@ source export.sh
 git clone https://github.com/mjmokhtar/fota-esp32-idf
 cd fota-esp32-idf
 
-# Configure (optional)
+# Konfigurasi (opsional)
 idf.py menuconfig
 
 # Build
@@ -69,74 +71,74 @@ python -m esptool --chip esp32 -b 460800 --before default_reset --after hard_res
 python -m serial.tools.miniterm "COM4" 115200
 ```
 
-### First Boot
+### Boot Pertama
 
-After flashing, the device will:
-1. Boot to `factory` partition
-2. Initialize WiFi (default credentials in code)
-3. Start OTA HTTP server on port 80
-4. LED blinks slowly (normal mode)
+Setelah flashing, perangkat akan:
+1. Boot ke partisi `factory`
+2. Menginisialisasi WiFi (kredensial default ada di kode)
+3. Menjalankan OTA HTTP server di port 80
+4. LED berkedip lambat (mode normal)
 
-## Usage Guide
+## Panduan Penggunaan
 
-### Normal Mode Operation
+### Operasi Mode Normal
 
-1. Device boots and connects to WiFi
-2. Find device IP in serial monitor:
+1. Perangkat boot dan terhubung ke WiFi
+2. Cari IP perangkat di serial monitor:
 ```
    I (xxx) WIFI_MGR: Got IP: 192.168.8.100
 ```
-3. Access OTA portal: `http://192.168.8.100`
-4. Enter firmware URL and click "Start Update"
+3. Akses portal OTA: `http://192.168.8.100`
+4. Masukkan URL firmware lalu klik "Start Update"
 
 ### Recovery Mode
 
-**Activation:**
-1. Connect jumper wire: GPIO4 → GND
-2. Press RESET button
-3. Wait for double-blink LED pattern
-4. Remove jumper wire
+**Aktivasi:**
+1. Hubungkan kabel jumper: GPIO4 → GND
+2. Tekan tombol RESET
+3. Tunggu pola LED kedip ganda
+4. Lepas kabel jumper
 
-**Usage:**
-1. Connect to WiFi AP: `ESP32-Recovery` / `recovery123`
-2. Open browser: `http://192.168.4.1`
-3. Configure WiFi credentials or trigger OTA update
-4. Reboot device
+**Penggunaan:**
+1. Hubungkan ke WiFi AP: `ESP32-Recovery` / `recovery123`
+2. Buka browser: `http://192.168.4.1`
+3. Konfigurasi kredensial WiFi atau picu update OTA
+4. Reboot perangkat
 
-### OTA Update Procedure
+### Prosedur Update OTA
 
-#### Step 1: Prepare Firmware
+#### Langkah 1: Siapkan Firmware
 ```bash
-# Build new version
+# Build versi baru
 idf.py build
 
-# (Optional) Add metadata for tracking
+# (Opsional) Tambahkan metadata untuk pelacakan
 python tools/prepare-firmware.py   build/secure-ota-esp32.bin release/firmware_v2.0.0.bin 2.0.0
 ```
 
-#### Step 2: Host Firmware
+#### Langkah 2: Host Firmware
 ```bash
 cd build/
 python -m http.server 8000
 ```
 
-#### Step 3: Trigger Update
+#### Langkah 3: Picu Update
 
-Via web portal, enter URL:
+Lewat portal web, masukkan URL:
 ```
-http://<YOUR_PC_IP>:8000/secure-ota-esp32.bin
+http://<IP_PC_KAMU>:8000/secure-ota-esp32.bin
 ```
 
-#### Step 4: Monitor Update
+#### Langkah 4: Pantau Update
 
-Serial output:
+Output serial:
 ```
 I (xxx) OTA_MGR: Starting OTA update
 I (xxx) OTA_MGR: Progress: 10% ... 100%
 I (xxx) OTA_MGR: OTA successful! Rebooting...
 ```
 
-After reboot:
+Setelah reboot:
 ```
 I (xxx) MAIN: New firmware detected, validating...
 [10 second wait - LED fast blink]
@@ -144,9 +146,9 @@ I (xxx) MAIN: Firmware validated successfully!
 I (xxx) MAIN: Running from partition: ota_0
 ```
 
-## Architecture
+## Arsitektur
 
-### Partition Layout
+### Layout Partisi
 ```
 ┌─────────────────────┐ 0x0000
 │   Bootloader        │ 32KB
@@ -199,57 +201,57 @@ I (xxx) MAIN: Running from partition: ota_0
     └──────────────┘
 ```
 
-For detailed architecture, see [ARCHITECTURE.md](docs/ARCHITECTURE.md)
+Untuk arsitektur lebih rinci, lihat [ARCHITECTURE.md](docs/ARCHITECTURE.md)
 
 
-## Troubleshooting
+## Pemecahan Masalah
 
-### Issue: Device stuck in download mode
-**Solution:** Ensure GPIO0 (BOOT button) is not pressed during normal boot
+### Masalah: Perangkat terjebak di download mode
+**Solusi:** Pastikan GPIO0 (tombol BOOT) tidak ditekan saat boot normal
 
-### Issue: WiFi connection fails
-**Solution:** Use recovery mode to reconfigure credentials
+### Masalah: Koneksi WiFi gagal
+**Solusi:** Gunakan recovery mode untuk mengonfigurasi ulang kredensial
 
-### Issue: OTA fails with "invalid magic byte"
-**Solution:** Ensure using raw binary (`secure-ota-esp32.bin`), not prepared version
+### Masalah: OTA gagal dengan "invalid magic byte"
+**Solusi:** Pastikan memakai biner mentah (`secure-ota-esp32.bin`), bukan versi yang sudah lewat prepare
 
-### Issue: Recovery mode not triggered
-**Solution:** Verify GPIO4 is LOW before pressing RESET, hold until LED double-blinks
+### Masalah: Recovery mode tidak terpicu
+**Solusi:** Pastikan GPIO4 dalam kondisi LOW sebelum menekan RESET, tahan sampai LED kedip ganda
 
-## Project Structure
+## Struktur Project
 ```
 firmware-assessment-esp32/
 ├── main/
-│   ├── main.c              # Main application logic
-│   ├── led_indicator.c/h   # LED control
+│   ├── main.c              # Logika aplikasi utama
+│   ├── led_indicator.c/h   # Kontrol LED
 │   ├── wifi_manager.c/h    # WiFi & NVS
-│   ├── ota_manager.c/h     # OTA implementation
-│   ├── recovery_mode.c/h   # Recovery portal
+│   ├── ota_manager.c/h     # Implementasi OTA
+│   ├── recovery_mode.c/h   # Portal recovery
 │   └── CMakeLists.txt
 ├── tools/
-│   └── prepare-firmware.py # Firmware metadata tool
+│   └── prepare-firmware.py # Tool metadata firmware
 ├── docs/
-│   ├── ARCHITECTURE.md     # Design decisions
-│   └── prompt.md           # AI assistance log
-├── partitions.csv          # Partition table
+│   ├── ARCHITECTURE.md     # Keputusan desain
+│   └── prompt.md           # Log bantuan AI
+├── partitions.csv          # Tabel partisi
 ├── CMakeLists.txt
 └── README.md
 ```
 
-## Development
+## Pengembangan
 
-### Code Style
+### Gaya Kode
 
-- Follow ESP-IDF coding conventions
-- Use ESP_LOG macros for logging
-- Add error handling for all operations
-- Document non-obvious code
+- Ikuti konvensi penulisan kode ESP-IDF
+- Gunakan makro ESP_LOG untuk logging
+- Tambahkan penanganan error untuk semua operasi
+- Dokumentasikan kode yang tidak jelas maksudnya
 
-## Author
+## Penulis
 
 **Muhammad Jumi'at Mokhtar** - Firmware Assessment Submission
 
-## Acknowledgments
+## Ucapan Terima Kasih
 
-- ESP-IDF by Espressif Systems
-- Assessment design by MJ Mokhtar
+- ESP-IDF oleh Espressif Systems
+- Desain assessment oleh MJ Mokhtar
